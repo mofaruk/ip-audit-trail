@@ -64,6 +64,17 @@ services:
     networks:
       - app-network
 
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    env_file:
+      - ./mongo/.env
+    volumes:
+      - ./mongo/data:/data/db
+    ports:
+      - "${MONGO_EXTERNAL_PORT}:27017"
+    networks:
+      - app-network
 
 networks:
   app-network:
