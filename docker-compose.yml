@@ -11,6 +11,20 @@ services:
     networks:
       - app-network
 
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env
+    volumes:
+      - ./frontend:/usr/src/app
+    stdin_open: true
+    tty: true
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
