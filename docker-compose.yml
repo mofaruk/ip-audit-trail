@@ -25,6 +25,19 @@ services:
     networks:
       - app-network
 
+  backend:
+    build: ./backend
+    container_name: backend
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+    networks:
+      - app-network
+    environment:
+      - ./backend/.env
+
+
 networks:
   app-network:
     driver: bridge
