@@ -52,6 +52,18 @@ services:
     environment:
       - ./backend/.env
 
+  mysql:
+    image: mysql:latest
+    container_name: mysql-audit
+    env_file:
+      - ./mysql/.env
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    ports:
+      - "${MYSQL_EXTERNAL_PORT}:3306"
+    networks:
+      - app-network
+
 
 networks:
   app-network:
