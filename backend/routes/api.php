@@ -1,13 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\IpAddressController;
 
-Route::get('/hello', function (Request $request) {
-    return response()->json([
-        'message' => 'Hi, api is working',
-        'staus' => '200',
-    ]);
+Route::group(['prefix' => 'v1'], function() {
+    Route::apiResource('ip', IpAddressController::class);
 });
-
-
