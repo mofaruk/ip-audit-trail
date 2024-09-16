@@ -36,7 +36,9 @@ services:
     env_file:
       - ./auth-service/.env
     volumes:
-      - ./auth-service:/var/www/html
+      - ./auth-service:/var/www
+    depends_on:
+      - mysql
     networks:
       - app-network
 
