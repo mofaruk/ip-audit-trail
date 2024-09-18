@@ -3,10 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\IpAddress;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
 
 class IpAddressController extends BaseController
 {
+    protected User $user;
+
+    public function __construct() {
+        $this->user = new User;
+        $this->user->id  = request()->header('X-Auth-User-Id');
+    }
+
     /**
      * Get all IP addresses
      *
@@ -14,7 +24,10 @@ class IpAddressController extends BaseController
      */
     public function index()
     {
-        return $this->sendApiResponse(IpAddress::all(), 200);
+        if($this->user->cannot('viewAny', new IpAddress)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+        return $this->sendApiResponse(IpAddress::latest()->get(), 200);
     }
 
     /**
@@ -29,10 +42,16 @@ class IpAddressController extends BaseController
             'ip' => 'required|ip',
             'label' => 'required|string|max:255',
             'comment' => 'nullable|string|max:255',
-            'user_id' => 'required',
         ]);
 
-        $ipAddress = IpAddress::create($request->all());
+        if($this->user->cannot('create', new IpAddress)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
+        $data = $request->all();
+        $data['user_id'] = $this->user->id;
+
+        $ipAddress = IpAddress::create($data);
 
         return $this->sendApiResponse($ipAddress, 201);
     }
@@ -46,6 +65,11 @@ class IpAddressController extends BaseController
     public function show($id)
     {
         $ipAddress = IpAddress::find($id);
+
+        if($this->user->cannot('view', $ipAddress)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         if (!$ipAddress) {
             return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
         }
@@ -66,17 +90,24 @@ class IpAddressController extends BaseController
             'ip' => 'ip',
             'label' => 'string|max:255',
             'comment' => 'string|max:255',
-            'user_id' => 'integer',
         ]);
 
-        $ipAddress = IpAddress::find($id); 
+        $ipAddress = IpAddress::find($id);
+
+        if($this->user->cannot('update', $ipAddress)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
+
         if (!$ipAddress) {
             return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
         }
 
-        $ipAddress->update($request->all());
+        $data = $request->all();
+        $data['modified_by'] = request()->header('X-Auth-User-Id');
+        $ipAddress->update($data);
 
-        return $this->sendApiResponse($ipAddress, 200);
+        return $this->sendApiResponse($data, 200);
     }
 
     /**
@@ -88,6 +119,11 @@ class IpAddressController extends BaseController
     public function destroy($id)
     {
         $ipAddress = IpAddress::find($id);
+
+        if($this->user->cannot('delete', $ipAddress)) {
+            //return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         if (!$ipAddress) {
             return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
         }
