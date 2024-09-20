@@ -1,16 +1,22 @@
-import IpTable from '@/components/ip-addresses/ip-table';
 import BackButton from '@/components/back-button';
-import IpPagination from '@/components/ip-addresses/ip-pagination';
+import IpDataTable from '@/components/ip-addresses/data-table';
+import IpAddress from '@/interfaces/ip-address';
 
-const IpAddresses = () => {
+
+const getData = async (): Promise<IpAddress[]> => {
+  let res = await fetch('https://mocki.io/v1/7527db3f-831a-4f94-8b3c-dc9da016df29')
+  return await res.json()
+}
+
+const IpAddresses = async () => {
+  const data = await getData();
+
   return (
     <>
       <BackButton text='Back' link='/' />
-      <IpTable
-        title='IP Addresses'
-        limit={10}
-      />
-      <IpPagination />
+      <div className="container mx-auto py-10">
+        <IpDataTable params={{data}}/>
+      </div>
     </>
   );
 };
