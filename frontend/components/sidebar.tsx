@@ -27,7 +27,7 @@ const Sidebar = () => {
           </CommandItem>
           <CommandItem>
             <EthernetPort className='mr-2 h-4 w-4' />
-            <Link href='/ip'>IP</Link>
+            <Link href='/ip-addresses'>IP Addresses</Link>
           </CommandItem>
           <CommandItem>
             <FileClock className='mr-2 h-4 w-4' />
