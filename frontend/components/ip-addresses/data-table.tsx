@@ -36,7 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import IpAddress from "@/interfaces/ip-address"
-import { columns } from "@/app/ip-addresses/columns"
+import { columns } from "@/app/(main)/ip-addresses/columns"
 
 interface IpDataTableProps {
   params: {

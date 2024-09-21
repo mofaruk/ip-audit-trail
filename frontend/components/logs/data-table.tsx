@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {columns} from "@/app/logs/columns"
+import {columns} from "@/app/(main)/logs/columns"
 import AuditLog from "@/interfaces/audit-log"
 
 interface IpDataTableProps {
