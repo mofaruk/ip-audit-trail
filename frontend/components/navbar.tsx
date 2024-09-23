@@ -10,7 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-// import ThemeToggler from '@/components/ThemeToggler';
+import LogoutButton from './logout-button';
+
 
 const Navbar = () => {
   return (
@@ -20,7 +21,6 @@ const Navbar = () => {
       </Link>
 
       <div className='flex items-center'>
-        {/* <ThemeToggler /> */}
         <DropdownMenu>
           <DropdownMenuTrigger className='focus:outline-none'>
             <Avatar>
@@ -35,7 +35,7 @@ const Navbar = () => {
               <Link href='/profile'>Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href='/auth'>Logout</Link>
+              <LogoutButton/>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

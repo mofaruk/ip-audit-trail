@@ -16,7 +16,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
+            'password' => 'required|confirmed|string|min:6',
         ]);
 
         $user = User::create([
@@ -38,12 +38,20 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
+            if (!JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
         } catch (JWTException $e) {
             return response()->json(['error' => 'Could not create token'], 500);
         }
+
+        $user = auth()->user();
+        $token = JWTAuth::claims([
+            'id'   => $user->id,
+            'name' => $user->name,
+            'role' => $user->role,
+        ])
+        ->attempt($credentials);
 
         return response()->json(compact('token'));
     }
@@ -102,14 +110,13 @@ class AuthController extends Controller
         if ($status === Password::PASSWORD_RESET) {
             $user = User::where('email', $request->email)->first();
             $token = auth()->login($user);
-    
+
             return response()->json([
                 'message' => 'Password successfully reset.',
                 'token' => $token
             ]);
         }
-    
+
         return response()->json(['message' => 'Invalid token or email.'], 400);
     }
 }
-

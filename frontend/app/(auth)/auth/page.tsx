@@ -1,11 +1,10 @@
-import { Button } from "@/components/ui/button"
+"use client"
+
 import {
   Card,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Tabs,
   TabsContent,
@@ -15,9 +14,75 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '@/public/images/logo.png';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { signInSchema } from "@/schemas/sign-in-schema"
+import { signUpSchema } from "@/schemas/sign-up-schema"
+import LoadingButton from "@/components/auth/loading-button"
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+import ErrorMessage from "@/components/error-message";
+import { useState } from "react"
+import { handleSignin, handleSignup } from "@/app/actions/auth-actions"
+import { useRouter } from "next/navigation"
 
 
-export default function Home() {
+const AuthPage = () => {
+  const [globalError, setGlobalError] = useState<string>("");
+  const router = useRouter();
+
+  const signInForm = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const signUpForm = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password_confirmation: "",
+      password: "",
+    },
+  });
+
+  const onSubmitLogin = async (values: z.infer<typeof signInSchema>) => {
+    try {
+      const result = await handleSignin(values);
+
+      if (result?.error) {
+        setGlobalError(result.error);
+      }
+
+      if(result?.status == 200) {
+        router.push('/')
+      }
+
+    } catch (error) {
+      console.log("An unexpected error occurred. Please try again.");
+    }
+  };
+
+  const onSubmitRegister = async (values: z.infer<typeof signUpSchema>) => {
+    try {
+      const result = await handleSignup(values);
+
+      if (result?.error) {
+        setGlobalError(result.error);
+      }
+
+      if(result?.status == 201) {
+        router.push('/')
+      }
+
+    } catch (error) {
+      console.log("An unexpected error occurred. Please try again.");
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <Link href='/' className="mx-auto mb-5">
@@ -31,46 +96,155 @@ export default function Home() {
         <TabsContent value="account">
           <Card>
             <CardContent className="space-y-2 py-5">
-              <div className="space-y-1">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" placeholder="your email" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder=" • • • • • •" />
-              </div>
+              {globalError && <ErrorMessage error={globalError} />}
+              <Form {...signInForm}>
+                <form
+                  onSubmit={signInForm.handleSubmit(onSubmitLogin)}
+                  className="space-y-8"
+                >
+                  <FormField
+                    control={signInForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="Enter your email address"
+                            autoComplete="off"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signInForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Enter password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <LoadingButton
+                    pending={signInForm.formState.isSubmitting}
+                  >
+                    Login
+                  </LoadingButton>
+                </form>
+              </Form>
             </CardContent>
-            <CardFooter>
-              <Button className="mx-auto">Login</Button>
-            </CardFooter>
           </Card>
         </TabsContent>
         <TabsContent value="password">
           <Card>
             <CardContent className="space-y-2 py-5">
-              <div className="space-y-1">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" placeholder="your full name" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" placeholder="your email" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder=" • • • • • •" />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="password_confirmation">Confirm Password</Label>
-                <Input id="password_confirmation" type="password" placeholder=" • • • • • •" />
-              </div>
+              {globalError && <ErrorMessage error={globalError} />}
+              <Form {...signUpForm}>
+                <form
+                  onSubmit={signUpForm.handleSubmit(onSubmitRegister)}
+                  className="space-y-8"
+                >
+                  <FormField
+                    control={signUpForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Enter your name"
+                            autoComplete="off"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signUpForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="Enter your email address"
+                            autoComplete="off"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signUpForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Enter password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signUpForm.control}
+                    name="password_confirmation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password Confirmation</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Re-Enter your password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <LoadingButton
+                    pending={signUpForm.formState.isSubmitting}
+                  >
+                    Register
+                  </LoadingButton>
+                </form>
+              </Form>
             </CardContent>
-            <CardFooter>
-              <Button className="mx-auto">Register</Button>
-            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
     </div>
   )
 }
+
+export default AuthPage
