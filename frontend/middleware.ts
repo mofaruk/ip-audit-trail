@@ -1,19 +1,18 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { getAuthUser } from './app/actions/auth-actions';
 
 
-export function middleware(req: NextRequest) {
-  const token = jwt.decode(cookies().get('token')?.value)
+export async function middleware(req: NextRequest) {
+  const user = await getAuthUser()
 
   if (req.nextUrl.pathname.startsWith('/auth')) {
-    return !!token 
+    return !!user 
       ? NextResponse.redirect(new URL('/', req.url))
       : NextResponse.next();
   }
 
-  if (!token) {
+  if (!user) {
     return NextResponse.redirect(new URL('/auth', req.url))
   }
 

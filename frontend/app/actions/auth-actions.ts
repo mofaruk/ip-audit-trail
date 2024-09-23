@@ -1,6 +1,9 @@
 "use server"
 
 import { cookies } from "next/headers";
+import jwt from 'jsonwebtoken';
+import { decryptToken, encryptToken } from "@/lib/crypto";
+
 
 type LoginCredential = {
   email: string,
@@ -62,7 +65,7 @@ export async function handleSignin({ email, password }: LoginCredential) {
 
     validateToken(data.token)
 
-    cookies().set('token', data.token, {
+    cookies().set('token', encryptToken(data.token), {
       httpOnly: true,
       secure: true,
     })
@@ -114,7 +117,7 @@ export async function handleSignup({ name, email, password, password_confirmatio
 
     validateToken(data.token)
 
-    cookies().set('token', data.token, {
+    cookies().set('token', encryptToken(data.token), {
       httpOnly: true,
       secure: true,
     })
@@ -151,12 +154,26 @@ export async function handleLogout() {
     }
   }
 
-  cookies().set('token', '', {
-    expires: 1
-  })
+  cookies().delete('token')
 
   return {
     status: res.status,
     message: "Logout successafully"
+  }
+}
+
+
+export async function getAuthUser() {
+  const encryptedToken = cookies().get('token')?.value
+
+  if (!encryptedToken) {
+    return null
+  }
+
+  try {
+    return jwt.decode(decryptToken(encryptedToken));
+  } catch (error) {
+    console.log(error)
+    return null
   }
 }
