@@ -177,3 +177,12 @@ export async function getAuthUser() {
     return null
   }
 }
+
+export async function getAuthUserToken() {
+  const encryptedToken = cookies().get('token')?.value
+
+  if (!encryptedToken) {
+    return null
+  }
+  return decryptToken(encryptedToken);
+}

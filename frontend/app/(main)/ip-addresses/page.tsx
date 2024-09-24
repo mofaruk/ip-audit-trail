@@ -1,10 +1,20 @@
+import { getAuthUserToken } from '@/app/actions/auth-actions';
 import BackButton from '@/components/back-button';
 import IpDataTable from '@/components/ip-addresses/data-table';
+import { Button } from '@/components/ui/button';
 import IpAddress from '@/interfaces/ip-address';
+import Link from 'next/link';
 
 
 const getData = async (): Promise<IpAddress[]> => {
-  let res = await fetch('https://mocki.io/v1/7527db3f-831a-4f94-8b3c-dc9da016df29')
+  let res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/ip-service/ip`,  {
+    headers: {
+      Authorization: `Bearer ${await getAuthUserToken()}`,
+    },
+  })
+
+  if (!res.ok)
+    return []
   return await res.json()
 }
 
@@ -14,6 +24,12 @@ const IpAddresses = async () => {
   return (
     <>
       <BackButton text='Back' link='/' />
+      <div className="flex justify-between">
+        <h3 className='text-2xl mb-4'> IP Address</h3>
+        <Button>
+          <Link href='/ip-addresses/create'>Add new</Link>
+        </Button>
+      </div>
       <div className="container mx-auto py-10">
         <IpDataTable params={{data}}/>
       </div>

@@ -18,61 +18,51 @@ import { useToast } from '@/components/ui/use-toast';
 import BackButton from '@/components/back-button';
 import IpAddress from '@/interfaces/ip-address';
 import { ipFormSchema } from '@/schemas/ip-form-schema';
-import { useState, useEffect } from 'react';
+import { createOrUpdateIpAddress } from '@/app/actions/ip-address-actions';
 
 
 type IpFormData = z.infer<typeof ipFormSchema>
 
-interface IpFormProps {
+type IpFormProps = {
   params: {
-    id: string | null;
-    formType: string;
+    id: string | null
+    formType: string
+    data?: IpAddress
   };
 }
 
 const IpForm = ({ params }: IpFormProps) => {
-  const [loading, setLoading] = useState(true);
-  const [initialValues, setInitialValues] = useState<IpFormData | null>(null);
-
-  // Fetch user data (mock example)
-  useEffect(() => {
-    async function fetchIpAddress() {
-      // Simulate fetching data from an API
-      const data = await fetch('https://mocki.io/v1/30118c02-2fde-4723-93a2-66b84ac162a1').then((res) => res.json());
-      setInitialValues(data);
-      setLoading(false);
-    }
-
-    if (params.formType == 'edit') {
-      fetchIpAddress();
-    }
-  }, []);
+  const { toast } = useToast();
 
   const form = useForm<IpFormData>({
     resolver: zodResolver(ipFormSchema),
     defaultValues: {
-      ip: '',
-      label: '',
-      comment: '',
+      ip: params.data?.ip ?? '',
+      label: params.data?.label ?? '',
+      comment: params.data?.comment ?? '',
     },
   });
 
-  useEffect(() => {
-    if (initialValues) {
-      form.reset(initialValues);  // Set form values when data is loaded
+  const onSubmit = async (data: IpFormData) => {
+    const res = await createOrUpdateIpAddress(params.formType, data, params.id)
+
+    if (!res) {
+      toast({
+        title: 'Something went wrong'
+      });
+      return
     }
-  }, [initialValues, form.reset]);
 
-  const { toast } = useToast();
-  const onSubmit = (data: IpFormData) => {
-    console.log('Form submitted with data:', data);
-    const title = params.formType == 'edit'
-      ? 'IP Address has been updated successfully'
-      : 'IP Address has been created successfully'
+    if (params.formType == 'edit'){
+      toast({
+        title: 'IP Address has been updated'
+      });
+      return
+    }
 
+    form.reset()
     toast({
-      title: title,
-      description: `Updated by --- `,
+      title: 'IP Address has been created'
     });
   };
 

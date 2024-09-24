@@ -1,5 +1,3 @@
-"use client"
-
 import { ColumnDef } from "@tanstack/react-table"
 import {
   DropdownMenu,
@@ -14,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 import IpAddress from "@/interfaces/ip-address"
 import Link from "next/link"
+import { deleteIpAddress } from "@/app/actions/ip-address-actions"
 
 
 export const columns: ColumnDef<IpAddress>[] = [
@@ -92,14 +91,14 @@ export const columns: ColumnDef<IpAddress>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
-              <Link href={`/ip-addresses/view/${ip.id}`}>View IP</Link>
+              <Link href={`/ip-addresses/${ip.id}`}>View IP</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Link href={`/ip-addresses/edit/${ip.id}`}>Edit IP</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => console.log('delete')}
+              onClick={async () => await deleteIpAddress(ip.id)}
             >
               Delete
             </DropdownMenuItem>

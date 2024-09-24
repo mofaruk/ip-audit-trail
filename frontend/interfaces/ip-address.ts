@@ -3,6 +3,8 @@ export default interface IpAddress {
     ip: string;
     label: string;
     comment: string;
-    user: string | null | number;
+    user_id: string | null | number;
+    created_at: string;
+    updated_at: string;
 }
 

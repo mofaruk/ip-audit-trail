@@ -1,3 +1,4 @@
+import { fetchIpAddress } from '@/app/actions/ip-address-actions';
 import IpForm from '@/components/ip-addresses/ip-form';
 
 interface IpAddressEditPageProps {
@@ -6,10 +7,14 @@ interface IpAddressEditPageProps {
   };
 }
 
-const IpAddressEditPage = ({ params }: IpAddressEditPageProps) => {
+const IpAddressEditPage = async ({ params }: IpAddressEditPageProps) => {
+
+  const data = await fetchIpAddress(params.id)
+
   const updateParams = {
     id: params.id,
     formType: 'edit',
+    data: data
   };
   return (
     <IpForm params={updateParams}/>

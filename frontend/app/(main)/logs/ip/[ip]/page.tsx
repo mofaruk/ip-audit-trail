@@ -1,10 +1,16 @@
+import { getAuthUserToken } from '@/app/actions/auth-actions';
 import BackButton from '@/components/back-button';
 import AuditLogDataTable from '@/components/logs/data-table';
 import AuditLog from '@/interfaces/audit-log';
 
 
-const getData = async (): Promise<AuditLog[]> => {
-  let res = await fetch('https://mocki.io/v1/3a4edc42-a94d-411a-8b3f-d173ac353152')
+const getData = async (ip: string): Promise<AuditLog[]> => {
+  const replacedIp = ip.replaceAll('.', '_')
+  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/ip-service/ip-audit/ip/${replacedIp}`,  {
+    headers: {
+      Authorization: `Bearer ${await getAuthUserToken()}`,
+    },
+  })
   return await res.json()
 }
 
@@ -15,7 +21,7 @@ type AuditLogByIpPageProps = {
 }
 
 const AuditLogByIpPage = async ({params}: AuditLogByIpPageProps) => {
-  const data = await getData();
+  const data = await getData(params.ip);
 
   return (
     <>

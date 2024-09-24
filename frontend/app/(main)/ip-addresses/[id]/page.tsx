@@ -3,31 +3,32 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import AuditLog from '@/interfaces/audit-log';
 import { getAuthUserToken } from '@/app/actions/auth-actions';
+import { cookies } from 'next/headers';
+import IpAddress from '@/interfaces/ip-address';
 
 
-const getData = async (id: string): Promise<AuditLog> => {
-  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/ip-service/ip-audit/${id}`,  {
+const getData = async (id: string): Promise<IpAddress> => {
+  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip/${id}`,  {
     headers: {
       Authorization: `Bearer ${await getAuthUserToken()}`,
+      'X-AT-Session': `${cookies().get('at_session')?.value}`,
     },
   })
   return await res.json()
 }
 
-type AuditLogPageProps = {
+type IpAddressViewPageProps = {
   params: {
     id: string
   }
 }
 
-const AuditLogPage = async ({params}: AuditLogPageProps) => {
-  const data: AuditLog = await getData(params.id);
+const IpAddressViewPage = async ({params}: IpAddressViewPageProps) => {
+  const data: IpAddress = await getData(params.id);
 
   return (
     <>
@@ -35,7 +36,7 @@ const AuditLogPage = async ({params}: AuditLogPageProps) => {
       <div className="container mx-auto py-5">
         <Card className="w-full md:w-2/3 mx-auto">
           <CardHeader>
-            <CardTitle>Change Detail</CardTitle>
+            <CardTitle>IP Address Detail</CardTitle>
             <CardDescription>ID: {params.id}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -51,26 +52,34 @@ const AuditLogPage = async ({params}: AuditLogPageProps) => {
                 </div>
                 <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
-                      Modified By
+                      Label
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {data.modified_by}
+                      {data.label}
                     </dd>
                 </div>
                 <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
-                      Event
+                      Comment
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {data.event}
+                      {data.comment}
                     </dd>
                 </div>
                 <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
-                      Session ID
+                      Created By
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {data.session_id}
+                      {data.user_id}
+                    </dd>
+                </div>
+                <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      Created At
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {data.created_at} 
                     </dd>
                 </div>
                 <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -79,16 +88,6 @@ const AuditLogPage = async ({params}: AuditLogPageProps) => {
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {data.updated_at} 
-                    </dd>
-                </div>
-                <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Changes
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      <pre>
-                        {JSON.stringify(data.changes, null, '\t')}
-                      </pre>
                     </dd>
                 </div>
             </dl>
@@ -100,4 +99,4 @@ const AuditLogPage = async ({params}: AuditLogPageProps) => {
   );
 };
 
-export default AuditLogPage;
+export default IpAddressViewPage;

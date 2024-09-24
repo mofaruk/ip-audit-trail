@@ -15,7 +15,7 @@ import LogoutButton from './logout-button';
 
 const Navbar = () => {
   return (
-    <div className='bg-primary dark:bg-slate-700 text-white py-2 px-5 flex justify-between'>
+    <nav className='bg-primary dark:bg-slate-700 text-white py-2 px-5 flex justify-between sticky top-0 z-50'>
       <Link href='/'>
         <Image src={logo} alt='Logo' width={40} />
       </Link>
@@ -40,7 +40,7 @@ const Navbar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </nav>
   );
 };
 
