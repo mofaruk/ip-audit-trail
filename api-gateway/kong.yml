@@ -1,0 +1,30 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: auth-service
+    url: http://auth-service:8000/api/
+    routes:
+      - name: auth-service-route
+        paths:
+          - /api/auth-service
+
+  - name: ip-service
+    url: http://backend:8000/api/
+    routes:
+      - name: ip-service-route
+        paths:
+          - /api/ip-service
+
+plugins:
+  - name: rate-limiting
+    service: auth-service
+    config:
+      minute: 5
+      policy: local
+
+  - name: rate-limiting
+    service: ip-service
+    config:
+      minute: 20
+      policy: local
