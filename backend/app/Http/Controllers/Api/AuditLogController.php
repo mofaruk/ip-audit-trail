@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\AuditLog;
+use Illuminate\Support\Facades\Gate;
 
 class AuditLogController extends BaseController
 {
@@ -14,6 +15,10 @@ class AuditLogController extends BaseController
      */
     public function index()
     {
+        if(!Gate::check('view', new AuditLog)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         $logs = AuditLog::latest()->get();
         return $this->sendApiResponse($logs);
     }
@@ -26,6 +31,10 @@ class AuditLogController extends BaseController
      */
     public function show($id)
     {
+        if(!Gate::check('view', new AuditLog)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         $logs = AuditLog::where('id', $id)->first();
         return $this->sendApiResponse($logs);
     }
@@ -38,6 +47,10 @@ class AuditLogController extends BaseController
      */
     public function getLogByUser(int $userId)
     {
+        if(!Gate::check('view', new AuditLog)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         $logs = AuditLog::where('modified_by', $userId)->get();
         return $this->sendApiResponse($logs);
     }
@@ -51,6 +64,10 @@ class AuditLogController extends BaseController
      */
     public function getLogByUserSession(int $userId, string $sessionId)
     {
+        if(!Gate::check('view', new AuditLog)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         $logs = AuditLog::where('modified_by', $userId)
             ->where('session_id', $sessionId)
             ->get();
@@ -65,6 +82,10 @@ class AuditLogController extends BaseController
      */
     public function getLogByIp(string $ip)
     {
+        if(!Gate::check('view', new AuditLog)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         $ip = str_replace('_', '.', $ip);
         $logs = AuditLog::where('ip', $ip)->get();
         return $this->sendApiResponse($logs);
@@ -79,6 +100,10 @@ class AuditLogController extends BaseController
      */
     public function getLogByUserIp(int $userId, string $ip)
     {
+        if(!Gate::check('view', new AuditLog)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         $ip = str_replace('_', '.', $ip);
         $logs = AuditLog::where('modified_by', $userId)
             ->where('ip', $ip)
@@ -97,6 +122,10 @@ class AuditLogController extends BaseController
      */
     public function getLogByIpInSession(int $userId, string $ip, string $sessionId)
     {
+        if(!Gate::check('view', new AuditLog)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         $ip = str_replace('_', '.', $ip);
         $logs = AuditLog::where('modified_by', $userId)
             ->where('ip', $ip)

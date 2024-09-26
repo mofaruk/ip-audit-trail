@@ -17,18 +17,21 @@ class RolesAndPermissionsSeeder extends Seeder
         // Create permissions
         Permission::create(['name' => 'create ip']);
         Permission::create(['name' => 'view ip']);
-        Permission::create(['name' => 'view all ip']);
         Permission::create(['name' => 'update ip']);
         Permission::create(['name' => 'delete ip']);
+        Permission::create(['name' => 'view any ip']);
+        Permission::create(['name' => 'update any ip']);
+        Permission::create(['name' => 'delete any ip']);
 
         // Create roles and assign permissions
-        $user = Role::create(['name' => 'user']);
+        $user = Role::create(['name' => 'user', "guard_name" => "api"]);
         $user->givePermissionTo('create ip');
         $user->givePermissionTo('view ip');
-        $user->givePermissionTo('view all ip');
         $user->givePermissionTo('update ip');
+        $user->givePermissionTo('delete ip');
+        $user->givePermissionTo('view any ip');
 
-        $admin = Role::create(['name' => 'admin']);
+        $admin = Role::create(['name' => 'admin', "guard_name" => "api"]);
         $admin->givePermissionTo(Permission::all());
 
         $user = User::create([

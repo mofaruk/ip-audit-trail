@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\IpAddressController;
 
-Route::group(['prefix' => 'v1'], function() {
+Route::group(['prefix' => 'v1', 'middleware' => ['api.auth']], function() {
     Route::apiResource('ip', IpAddressController::class);
     Route::get('ip-audit', [AuditLogController::class, 'index']);
     Route::get('ip-audit/{id}', [AuditLogController::class, 'show']);

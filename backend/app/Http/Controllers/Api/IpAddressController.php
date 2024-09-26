@@ -2,21 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Classes\ApiUser;
 use App\Models\IpAddress;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 
 class IpAddressController extends BaseController
 {
-    protected User $user;
+    protected ApiUser $apiUser;
 
-    public function __construct() {
-        $this->user = new User;
-        $this->user->id  = request()->header('X-Auth-User-Id');
+    public function __construct(Request $request) {
+        $this->apiUser = $request->attributes->get('apiUser');
     }
-
     /**
      * Get all IP addresses
      *
@@ -24,8 +22,8 @@ class IpAddressController extends BaseController
      */
     public function index()
     {
-        if($this->user->cannot('viewAny', new IpAddress)) {
-            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        if(!Gate::check('viewAny', new IpAddress)) {
+            return $this->sendApiResponse(['error' => 'Unathorized access'], 401);
         }
         return $this->sendApiResponse(IpAddress::latest()->get(), 200);
     }
@@ -38,18 +36,22 @@ class IpAddressController extends BaseController
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'ip' => 'required|ip',
             'label' => 'required|string|max:255',
             'comment' => 'nullable|string|max:255',
         ]);
 
-        if($this->user->cannot('create', new IpAddress)) {
+        if ($validator->fails()) {
+            return $this->sendApiResponse($validator->errors(), 400);
+        }
+
+        if(!Gate::check('create', new IpAddress)) {
             return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
         }
 
         $data = $request->all();
-        $data['user_id'] = $this->user->id;
+        $data['user_id'] = $this->apiUser->id;
 
         $ipAddress = IpAddress::create($data);
 
@@ -66,12 +68,12 @@ class IpAddressController extends BaseController
     {
         $ipAddress = IpAddress::find($id);
 
-        if($this->user->cannot('view', $ipAddress)) {
-            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
-        }
-
         if (!$ipAddress) {
             return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
+        }
+
+        if(!Gate::any(['view', 'viewAny'], $ipAddress)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access.'], 401);
         }
 
         return $this->sendApiResponse($ipAddress, 200);
@@ -86,25 +88,27 @@ class IpAddressController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'ip' => 'ip',
             'label' => 'string|max:255',
             'comment' => 'string|max:255',
         ]);
 
-        $ipAddress = IpAddress::find($id);
-
-        if($this->user->cannot('update', $ipAddress)) {
-            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        if ($validator->fails()) {
+            return $this->sendApiResponse($validator->errors(), 400);
         }
 
-
+        $ipAddress = IpAddress::find($id);
         if (!$ipAddress) {
             return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
         }
 
+        if(!Gate::any(['update', 'updateAny'], $ipAddress)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        }
+
         $data = $request->all();
-        $data['modified_by'] = request()->header('X-Auth-User-Id');
+        $data['modified_by'] = $this->apiUser->id;
         $ipAddress->update($data);
 
         return $this->sendApiResponse($data, 200);
@@ -119,13 +123,12 @@ class IpAddressController extends BaseController
     public function destroy($id)
     {
         $ipAddress = IpAddress::find($id);
-
-        if($this->user->cannot('delete', $ipAddress)) {
-            //return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
-        }
-
         if (!$ipAddress) {
             return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
+        }
+
+        if(!Gate::any(['delete', 'deleteAny'], $ipAddress)) {
+            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
         }
 
         $ipAddress->delete();

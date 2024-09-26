@@ -2,39 +2,58 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
     public function register(Request $request) {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|confirmed|string|min:6',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
-        $token = JWTAuth::fromUser($user);
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+    
+            $user->assignRole('user');
+    
+            $token = JWTAuth::fromUser($user);
+        } catch (Exception $ex) {
+            Log::info($ex);
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
 
         return response()->json(compact('user', 'token'), 201);
     }
 
     public function login(Request $request) {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
         $credentials = $request->only('email', 'password');
 
         try {
@@ -58,7 +77,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-        auth()->logout();
+        auth()->logout(true);
         return response()->json(['message' => 'Successfully logged out']);
     }
 
@@ -76,12 +95,31 @@ class AuthController extends Controller
     }
 
     public function me() {
-        return response()->json(auth()->user());
+
+        try {
+            $user =  auth()->user()->toArray();
+
+            $user['roles'] = auth()->user()->getRoleNames();
+            $user['permissions'] = auth()
+                ->user()
+                ->getAllPermissions()
+                ->pluck('name');
+        } catch (Exception $ex) {
+            Log::error($ex);
+            response()->json(['error' => 'Something went wrong', 500]);
+        }
+        return response()->json($user);
     }
 
     public function forgotPassword(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
         $status = Password::sendResetLink($request->only('email'));
 
@@ -93,11 +131,15 @@ class AuthController extends Controller
     // Reset password using the token received via email
     public function resetPassword(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'token' => 'required',
             'password' => 'required|string|min:6|confirmed',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
