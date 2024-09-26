@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 
 const getData = async (): Promise<IpAddress[]> => {
-  let res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/ip-service/ip`,  {
+  let res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip`,  {
     headers: {
       Authorization: `Bearer ${await getAuthUserToken()}`,
     },

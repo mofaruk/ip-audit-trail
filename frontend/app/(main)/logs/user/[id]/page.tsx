@@ -6,7 +6,7 @@ import IpAddress from '@/interfaces/ip-address';
 
 
 const getData = async (userId: number): Promise<AuditLog[]> => {
-  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/ip-service/ip-audit/user/${userId}`,  {
+  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip-audit/user/${userId}`,  {
     headers: {
       Authorization: `Bearer ${await getAuthUserToken()}`,
     },

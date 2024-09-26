@@ -5,7 +5,7 @@ import AuditLog from '@/interfaces/audit-log';
 
 
 const getData = async (): Promise<AuditLog[]> => {
-  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/ip-service/ip-audit`,  {
+  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip-audit`,  {
     headers: {
       Authorization: `Bearer ${await getAuthUserToken()}`,
     },

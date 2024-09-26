@@ -5,7 +5,7 @@ import { ipFormSchema } from "@/schemas/ip-form-schema"
 import { z } from "zod"
 
 export async function fetchIpAddress(id: string) {
-    const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/ip-service/ip/${id}`,  {
+    const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip/${id}`,  {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ export async function fetchIpAddress(id: string) {
 }
 
 export async function createOrUpdateIpAddress(action: string, data: z.infer<typeof ipFormSchema>, id: string | null) {
-  const apiUri = id ? `api/v1/ip-service/ip/${id}` : `api/v1/ip-service/ip`
+  const apiUri = id ? `api/ip-service/v1/ip/${id}` : `api/ip-service/v1/ip`
   const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/${apiUri}`,  {
     method: action == 'create' ? 'POST' : 'PUT',
     headers: {
@@ -33,7 +33,7 @@ export async function createOrUpdateIpAddress(action: string, data: z.infer<type
 }
 
 export async function deleteIpAddress(id: string) {
-  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/ip-service/ip/${id}`, {
+  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip/${id}`, {
     method: 'DELETE',
     headers: {
       'Accept': 'application/json',

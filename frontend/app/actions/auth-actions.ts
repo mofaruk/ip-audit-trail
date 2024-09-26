@@ -19,7 +19,7 @@ type RegisterFormInput = {
 
 const validateToken = async (token: string) => {
   try {
-    const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/auth/me`, {
+    const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/auth-service/v1/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -42,7 +42,7 @@ export async function handleSignin({ email, password }: LoginCredential) {
     return null;
   }
   try {
-    const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/auth/login`, {
+    const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/auth-service/v1/login`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -93,7 +93,7 @@ export async function handleSignup({ name, email, password, password_confirmatio
     }
   }
   try {
-    const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/auth/register`, {
+    const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/auth-service/v1/register`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -138,7 +138,7 @@ export async function handleSignup({ name, email, password, password_confirmatio
 
 export async function handleLogout() {
   const token = cookies().get('token')?.value
-  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/v1/auth/logout`, {
+  const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/auth-service/v1/logout`, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
