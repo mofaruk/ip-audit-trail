@@ -9,12 +9,14 @@ import {
 } from "@/components/ui/card"
 import AuditLog from '@/interfaces/audit-log';
 import { getAuthUserToken } from '@/app/actions/auth-actions';
+import { cookies } from 'next/headers';
 
 
 const getData = async (id: string): Promise<AuditLog> => {
   const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip-audit/${id}`,  {
     headers: {
       Authorization: `Bearer ${await getAuthUserToken()}`,
+      'X-AT-Session': `${cookies().get('at_session')?.value}`,
     },
   })
   return await res.json()

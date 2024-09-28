@@ -4,6 +4,7 @@ import "../globals.css";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import { Toaster } from "@/components/ui/toaster";
+import SessionChecker from "@/components/session-checker";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         </div>
 
         <Toaster/>
+        <SessionChecker />
       </body>
     </html>
   );

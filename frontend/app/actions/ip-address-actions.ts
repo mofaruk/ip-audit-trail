@@ -2,6 +2,7 @@
 
 import { getAuthUserToken } from "./auth-actions"
 import { ipFormSchema } from "@/schemas/ip-form-schema"
+import { cookies } from "next/headers"
 import { z } from "zod"
 
 export async function fetchIpAddress(id: string) {
@@ -10,6 +11,7 @@ export async function fetchIpAddress(id: string) {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         Authorization: `Bearer ${await getAuthUserToken()}`,
+        'X-AT-Session': `${cookies().get('at_session')?.value}`,
       },
     })
     if (!res.ok) return []
@@ -25,6 +27,7 @@ export async function createOrUpdateIpAddress(action: string, data: z.infer<type
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       Authorization: `Bearer ${await getAuthUserToken()}`,
+      'X-AT-Session': `${cookies().get('at_session')?.value}`,
     },
     body: JSON.stringify(data)
   })
@@ -39,6 +42,7 @@ export async function deleteIpAddress(id: string) {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       Authorization: `Bearer ${await getAuthUserToken()}`,
+      'X-AT-Session': `${cookies().get('at_session')?.value}`,
     },
   })
   console.log(res.status, res.statusText)

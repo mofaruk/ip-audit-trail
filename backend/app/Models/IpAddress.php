@@ -54,10 +54,13 @@ class IpAddress extends Model
         }
         
         try {
+            $request = request();
+            $apiUser = $request->attributes->get('apiUser');
+
             return AuditLog::create([
                 'ip' => $ipAddress->ip,
-                'modified_by' => 1,
-                'session_id' => session()->getId(),
+                'modified_by' => $apiUser->id,
+                'session_id' =>  $request->header('X-AT-Session') ?? session()->getId(),
                 'event' => $event,
                 'changes' => $changes,
             ]);

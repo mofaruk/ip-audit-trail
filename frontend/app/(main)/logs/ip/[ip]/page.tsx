@@ -2,6 +2,7 @@ import { getAuthUserToken } from '@/app/actions/auth-actions';
 import BackButton from '@/components/back-button';
 import AuditLogDataTable from '@/components/logs/data-table';
 import AuditLog from '@/interfaces/audit-log';
+import { cookies } from 'next/headers';
 
 
 const getData = async (ip: string): Promise<AuditLog[]> => {
@@ -9,6 +10,7 @@ const getData = async (ip: string): Promise<AuditLog[]> => {
   const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip-audit/ip/${replacedIp}`,  {
     headers: {
       Authorization: `Bearer ${await getAuthUserToken()}`,
+      'X-AT-Session': `${cookies().get('at_session')?.value}`,
     },
   })
   return await res.json()

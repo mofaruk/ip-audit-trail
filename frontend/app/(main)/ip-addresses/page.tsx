@@ -3,6 +3,7 @@ import BackButton from '@/components/back-button';
 import IpDataTable from '@/components/ip-addresses/data-table';
 import { Button } from '@/components/ui/button';
 import IpAddress from '@/interfaces/ip-address';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 
 
@@ -10,6 +11,7 @@ const getData = async (): Promise<IpAddress[]> => {
   let res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/ip-service/v1/ip`,  {
     headers: {
       Authorization: `Bearer ${await getAuthUserToken()}`,
+      'X-AT-Session': `${cookies().get('at_session')?.value}`,
     },
   })
 
