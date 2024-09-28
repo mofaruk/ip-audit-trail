@@ -39,8 +39,12 @@ class IpAddress extends Model
 
     /**
      * Log changes of the IP
+     *
+     * @param IpAddress $ipAddress
+     * @param string $event
+     * @return AuditLog|false
      */
-    protected static function logIpChange(IpAddress $ipAddress, $event)
+    protected static function logIpChange(IpAddress $ipAddress, string $event): AuditLog|false
     {
         if ($event === 'updated') {
             $changes = $ipAddress->getChanges();
@@ -50,7 +54,7 @@ class IpAddress extends Model
         }
         
         try {
-            AuditLog::create([
+            return AuditLog::create([
                 'ip' => $ipAddress->ip,
                 'modified_by' => 1,
                 'session_id' => session()->getId(),
@@ -59,6 +63,7 @@ class IpAddress extends Model
             ]);
         } catch (Exception $ex) {
             Log::error($ex->getMessage(), $ex);
+            return false;
         }
     }
 

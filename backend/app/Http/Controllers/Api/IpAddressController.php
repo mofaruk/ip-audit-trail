@@ -2,19 +2,33 @@
 
 namespace App\Http\Controllers\Api;
 
+use Exception;
 use App\Classes\ApiUser;
 use App\Models\IpAddress;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class IpAddressController extends BaseController
 {
+    /**
+     * Authenticated API user
+     *
+     * @var ApiUser
+     */
     protected ApiUser $apiUser;
 
-    public function __construct(Request $request) {
+    /**
+     * Default constructor of the controller
+     *
+     * @param Request $request
+     */
+    public function __construct(Request $request)
+    {
         $this->apiUser = $request->attributes->get('apiUser');
     }
+
     /**
      * Get all IP addresses
      *
@@ -22,10 +36,10 @@ class IpAddressController extends BaseController
      */
     public function index()
     {
-        if(!Gate::check('viewAny', new IpAddress)) {
-            return $this->sendApiResponse(['error' => 'Unathorized access'], 401);
+        if (!Gate::check('viewAny', new IpAddress)) {
+            return $this->sendUnauthorizedResponse();
         }
-        return $this->sendApiResponse(IpAddress::latest()->get(), 200);
+        return $this->sendResponse(IpAddress::latest()->get(), 200);
     }
 
     /**
@@ -43,19 +57,24 @@ class IpAddressController extends BaseController
         ]);
 
         if ($validator->fails()) {
-            return $this->sendApiResponse($validator->errors(), 400);
+            return $this->sendResponse($validator->errors(), 400);
         }
 
-        if(!Gate::check('create', new IpAddress)) {
-            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        if (!Gate::check('create', new IpAddress)) {
+            return $this->sendUnauthorizedResponse();
         }
 
         $data = $request->all();
         $data['user_id'] = $this->apiUser->id;
 
-        $ipAddress = IpAddress::create($data);
+        try {
+            $ipAddress = IpAddress::create($data);
+        } catch (Exception $ex) {
+            Log::error($ex->getMessage());
+            return $this->sendInternalErrorResponse();
+        }
 
-        return $this->sendApiResponse($ipAddress, 201);
+        return $this->sendResponse($ipAddress, 201);
     }
 
     /**
@@ -69,14 +88,14 @@ class IpAddressController extends BaseController
         $ipAddress = IpAddress::find($id);
 
         if (!$ipAddress) {
-            return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
+            return $this->sendResponse(['error' => 'requested resource not found'], 404);
         }
 
-        if(!Gate::any(['view', 'viewAny'], $ipAddress)) {
-            return $this->sendApiResponse(['error' => 'Unauthorized access.'], 401);
+        if (!Gate::any(['view', 'viewAny'], $ipAddress)) {
+            return $this->sendUnauthorizedResponse();
         }
 
-        return $this->sendApiResponse($ipAddress, 200);
+        return $this->sendResponse($ipAddress, 200);
     }
 
     /**
@@ -95,23 +114,28 @@ class IpAddressController extends BaseController
         ]);
 
         if ($validator->fails()) {
-            return $this->sendApiResponse($validator->errors(), 400);
+            return $this->sendResponse($validator->errors(), 400);
         }
 
         $ipAddress = IpAddress::find($id);
         if (!$ipAddress) {
-            return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
+            return $this->sendResponse(['error' => 'requested resource not found'], 404);
         }
 
-        if(!Gate::any(['update', 'updateAny'], $ipAddress)) {
-            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        if (!Gate::any(['update', 'updateAny'], $ipAddress)) {
+            return $this->sendUnauthorizedResponse();
         }
 
         $data = $request->all();
         $data['modified_by'] = $this->apiUser->id;
-        $ipAddress->update($data);
+        try {
+            $ipAddress->update($data);
+        } catch (Exception $ex) {
+            Log::error($ex->getMessage(), $ex);
+            return $this->sendInternalErrorResponse();
+        }
 
-        return $this->sendApiResponse($data, 200);
+        return $this->sendResponse($data, 200);
     }
 
     /**
@@ -124,15 +148,20 @@ class IpAddressController extends BaseController
     {
         $ipAddress = IpAddress::find($id);
         if (!$ipAddress) {
-            return $this->sendApiResponse(['error' => 'requested resource not found'], 404);
+            return $this->sendResponse(['error' => 'requested resource not found'], 404);
         }
 
-        if(!Gate::any(['delete', 'deleteAny'], $ipAddress)) {
-            return $this->sendApiResponse(['error' => 'Unauthorized access'], 401);
+        if (!Gate::any(['delete', 'deleteAny'], $ipAddress)) {
+            return $this->sendUnauthorizedResponse();
         }
 
-        $ipAddress->delete();
+        try {
+            $ipAddress->delete();
+        } catch (Exception $ex) {
+            Log::error($ex->getMessage(), $ex);
+            return $this->sendInternalErrorResponse();
+        }
 
-        return $this->sendApiResponse(null, 204);
+        return $this->sendResponse(null, 204);
     }
 }

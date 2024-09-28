@@ -28,7 +28,7 @@ class IpAddressPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determine whether the user can view the IP Address.
      */
     public function view(?User $user, IpAddress $ipAddress): bool
     {
@@ -36,7 +36,7 @@ class IpAddressPolicy
     }
 
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the user can view any IP Address.
      */
     public function viewAny(?User $user): bool
     {
@@ -44,7 +44,7 @@ class IpAddressPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the user can create IP Address.
      */
     public function create(?User $user): bool
     {
@@ -52,7 +52,7 @@ class IpAddressPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determine whether the user can update the IP Address.
      */
     public function update(?User $user, IpAddress $ipAddress): bool
     {
@@ -60,7 +60,7 @@ class IpAddressPolicy
     }
 
     /**
-     * Determine whether the user can update any models.
+     * Determine whether the user can update any IP Address.
      */
     public function updateAny(?User $user): bool
     {
@@ -68,7 +68,7 @@ class IpAddressPolicy
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Determine whether the user can delete the IP Address.
      */
     public function delete(?User $user, IpAddress $ipAddress): bool
     {
@@ -76,7 +76,7 @@ class IpAddressPolicy
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Determine whether the user can delete the IP Address.
      */
     public function deleteAny(?User $user): bool
     {
