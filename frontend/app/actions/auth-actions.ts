@@ -36,7 +36,6 @@ const validateToken = async (token: string) => {
 }
 
 
-
 export async function handleSignin({ email, password }: LoginCredential) {
 
   if (!password || !email) {
@@ -145,7 +144,6 @@ export async function handleSignup({ name, email, password, password_confirmatio
 }
 
 export async function handleLogout() {
-  console.log("Hello" + "  " + `${process.env.AUTH_MICROSERVICE_URL}/api/auth-service/v1/logout ${await getAuthUserToken()}`)
 
   const res = await fetch(`${process.env.AUTH_MICROSERVICE_URL}/api/auth-service/v1/logout`, {
     method: 'POST',

@@ -28,7 +28,7 @@ const Sidebar = async () => {
             <EthernetPort className='mr-2 h-4 w-4' />
             <Link href='/ip-addresses'>IP Addresses</Link>
           </CommandItem>
-          {user?.role == 'admin' && 
+          {user?.roles?.includes('admin') && 
           <CommandItem>
             <FileClock className='mr-2 h-4 w-4' />
             <Link href='/logs'>Audit Log</Link>

@@ -42,7 +42,15 @@ class AuthController extends ApiBaseController
 
             $user->assignRole('user');
 
-            $token = JWTAuth::fromUser($user);
+            $token = JWTAuth::claims([
+                'id'   => $user->id,
+                'name' => $user->name,
+                'roles' => ['user'],
+                'permissions' => $user->getAllPermissions()->pluck('name'),
+            ])
+            ->attempt($request->all());
+
+            $user = $user->only('name', 'id');
         } catch (Exception $ex) {
             Log::info($ex);
             return $this->sendResponse(['error' => 'Something went wrong'], 500);
@@ -80,11 +88,12 @@ class AuthController extends ApiBaseController
 
         $user = auth()->user();
         $token = JWTAuth::claims([
-            'id'   => $user->id,
-            'name' => $user->name,
-            'role' => $user->role,
+            'id'         => $user->id,
+            'name'       => $user->name,
+            'roles'      => $user->getRoleNames(),
+            'permissions' => $user->getAllPermissions()->pluck('name')
         ])
-            ->attempt($credentials);
+        ->attempt($credentials);
 
         return $this->sendResponse(compact('token'));
     }
@@ -108,7 +117,7 @@ class AuthController extends ApiBaseController
     public function refresh(): JsonResponse
     {
         try {
-            if (!$token = auth()->refresh(true, true)) {
+            if (!$token = auth()->refresh(true, false)) {
                 return $this->sendResponse(['error' => 'Cannot validate current token'], 401);
             }
         } catch (JWTException $e) {

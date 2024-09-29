@@ -18,13 +18,12 @@ export default async function LogLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const user = await getAuthUser();
 
   return (
     <>
       {
-        user.role == 'admin' ? children :
+        user?.roles?.includes('admin') ? children :
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>401 Unauthorized access</AlertTitle>
