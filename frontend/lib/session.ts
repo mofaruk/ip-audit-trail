@@ -1,5 +1,6 @@
 "use server"
 
+import { getAuthUser } from "@/app/actions/auth-actions"
 import { randomUUID } from "crypto"
 import { cookies } from "next/headers"
 
@@ -10,5 +11,9 @@ export const checkSession = () => {
       secure: process.env.NODE_ENV === "production",
       maxAge: undefined
     })
+  }
+
+  if (!getAuthUser()) {
+    cookies().delete('token')
   }
 }
