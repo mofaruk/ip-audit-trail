@@ -24,10 +24,6 @@ RUN composer install --optimize-autoloader --no-dev --no-interaction --prefer-di
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www
 
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
-
 EXPOSE 8000
 
-CMD php -S 0.0.0.0:8000 -t public
+CMD sh ./init.sh && php -S 0.0.0.0:8000 -t public

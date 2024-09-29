@@ -15,28 +15,29 @@ class RolesAndPermissionsSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create permissions
-        Permission::create(['name' => 'create ip']);
-        Permission::create(['name' => 'view ip']);
-        Permission::create(['name' => 'update ip']);
-        Permission::create(['name' => 'delete ip']);
-        Permission::create(['name' => 'view any ip']);
-        Permission::create(['name' => 'update any ip']);
-        Permission::create(['name' => 'delete any ip']);
+        Permission::firstOrCreate(['name' => 'create ip']);
+        Permission::firstOrCreate(['name' => 'view ip']);
+        Permission::firstOrCreate(['name' => 'update ip']);
+        Permission::firstOrCreate(['name' => 'delete ip']);
+        Permission::firstOrCreate(['name' => 'view any ip']);
+        Permission::firstOrCreate(['name' => 'update any ip']);
+        Permission::firstOrCreate(['name' => 'delete any ip']);
 
         // Create roles and assign permissions
-        $user = Role::create(['name' => 'user', "guard_name" => "api"]);
+        $user = Role::firstOrCreate(['name' => 'user', "guard_name" => "api"]);
         $user->givePermissionTo('create ip');
         $user->givePermissionTo('view ip');
         $user->givePermissionTo('update ip');
         $user->givePermissionTo('delete ip');
         $user->givePermissionTo('view any ip');
 
-        $admin = Role::create(['name' => 'admin', "guard_name" => "api"]);
+        $admin = Role::firstOrCreate(['name' => 'admin', "guard_name" => "api"]);
         $admin->givePermissionTo(Permission::all());
 
-        $user = User::create([
+        $user = User::firstOrCreate([
             'name' => 'Admin',
             'email'=> 'admin@local.dev',
+        ], [
             'password' => bcrypt('123456')
         ]);
 
