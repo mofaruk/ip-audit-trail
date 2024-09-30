@@ -55,13 +55,19 @@ This project aims to develop a robust and secure API for managing IP addresses. 
    ```
 
 ### Usage
-- In local environment use `http://localhost:3000` for frontend.
+- In local environment use `http://localhost:8050` for frontend.
+- A default user is created with `Admin` role using following credential
+  ```
+  username/email: admin@local.dev
+  password: 123456
+  ```
+- Additional user (Role: User) would be created by registration
 
 ### API Documentation
 You'll get the API documentation here: [https://documenter.getpostman.com/view/12872228/2sAXqzWdTm](https://documenter.getpostman.com/view/12872228/2sAXqzWdTm)
 
 ### Future Improvement Plan
-1. Currently the emails are send from `Auth` microservice, `mail` microservice should be separated from `Auth` microservice.
+1. Currently the emails are sent from `Auth` microservice, `mail` microservice should be separated from `Auth` microservice.
 2. Logging and monitoring service should be implemented.
 3. UX should be improved.
 4. Test coverage and code coverage should be increased.
