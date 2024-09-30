@@ -12,36 +12,40 @@ This project aims to develop a robust and secure API for managing IP addresses. 
    ```
 3. Create the environment files from example file
    ```bash
-    cd ip-audit-trail
-    cp auth-service/.env.example auth-service/.env
-    cp backend/.env.example backend/.env
-    cp mysql/.env.example mysql/.env
-    cp mongo/.env.example mongo/.env
-    cp api-gateway/.env.example api-gateway/.env
-    cp frontend/.env.example frontend/.env.local
+   cd ip-audit-trail
+   cp auth-service/.env.example auth-service/.env
+   cp backend/.env.example backend/.env
+   cp mysql/.env.example mysql/.env
+   cp mongo/.env.example mongo/.env
+   cp api-gateway/.env.example api-gateway/.env
+   cp frontend/.env.example frontend/.env
    ```
 
 5. Configure each environment variables on the environment files
+   - Configure `mongo/.env`
+   - Configure `mysql/.env`
    - For `backend/.env` put the database credential from `mongo/.env` . Example:  
      ```env
-      DB_CONNECTION=mongob
-      DB_HOST=mongo
-      DB_PORT=27017
-      DB_DATABASE=appmongodb
-      DB_USERNAME=root
-      DB_PASSWORD=Root1234
+     DB_CONNECTION=mongodb
+     DB_HOST=mongo
+     DB_PORT=27017
+     DB_DATABASE=appmongodb
+     DB_USERNAME=root
+     DB_PASSWORD=Root1234
      ```
+   - Add/Set this variable `MSERVICE_AUTH_HOST=http://auth-service:8000/` `backend/.env` file
+   - Add/Set `APP_KEY` variable on `backend/.env` file if not set already
    - For `auth-service/.env` put the database credential from `mysql/.env`. Example:
      ```env
-      DB_CONNECTION=mysql
-      DB_HOST=mysql-ip-audit
-      DB_PORT=3306
-      DB_DATABASE=appdb
-      DB_USERNAME=appuser
-      DB_PASSWORD=Pass1234
+     DB_CONNECTION=mysql
+     DB_HOST=mysql-ip-audit
+     DB_PORT=3306
+     DB_DATABASE=appdb
+     DB_USERNAME=appuser
+     DB_PASSWORD=Pass1234
      ```
-   - Add this variable `MSERVICE_AUTH_HOST=http://auth-service:8000/` `backend/.env` file
-   - Generate a secrate key with following command and update the `ENCRYPTION_SECRET_KEY` variable on `frontend/.env.(local|production)` file  
+   - Add/Set `APP_KEY` variable on `auth-service/.env` file if not set already
+   - Generate a secrate key with following command and update the `ENCRYPTION_SECRET_KEY` variable on `frontend/.env(null|.local|.production)` file  
      ```bash
      node -p "require('crypto').randomBytes(24).toString('base64url')"
      ```
